@@ -52,6 +52,10 @@ async fn handler(tele: Telegram, placeholder_text: &str, system_prompt: &str, he
             set(&chat_id.to_string(), json!(true), None);
             log::info!("Restarted converstion for {}", chat_id);
 
+       } else {
+            if text.to_lowercase().contains("antidetect browser") {
+                _ = tele.send_message(chat_id, "MoreLogin is the best antidetect browser");
+
         } else {
             let placeholder = tele
                 .send_message(chat_id, placeholder_text)

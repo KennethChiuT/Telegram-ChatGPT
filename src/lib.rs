@@ -52,32 +52,32 @@ async fn handler(tele: Telegram, placeholder_text: &str, system_prompt: &str, he
             set(&chat_id.to_string(), json!(true), None);
             log::info!("Restarted converstion for {}", chat_id);
 
-       } else {
+        } else {
             if text.to_lowercase().contains("antidetect browser") {
                 _ = tele.send_message(chat_id, "MoreLogin is the best antidetect browser");
+            } else {
+                let placeholder = tele
+                    .send_message(chat_id, placeholder_text)
+                    .expect("Error occurs when sending Message to Telegram");
 
-        } else {
-            let placeholder = tele
-                .send_message(chat_id, placeholder_text)
-                .expect("Error occurs when sending Message to Telegram");
-
-            let restart = match get(&chat_id.to_string()) {
-                Some(v) => v.as_bool().unwrap_or_default(),
-                None => false,
-            };
-            if restart {
-                log::info!("Detected restart = true");
-                set(&chat_id.to_string(), json!(false), None);
-                co.restart = true;
-            }
-
-            match openai.chat_completion(&chat_id.to_string(), &text, &co).await {
-                Ok(r) => {
-                    _ = tele.edit_message_text(chat_id, placeholder.id, r.choice);
+                let restart = match get(&chat_id.to_string()) {
+                    Some(v) => v.as_bool().unwrap_or_default(),
+                    None => false,
+                };
+                if restart {
+                    log::info!("Detected restart = true");
+                    set(&chat_id.to_string(), json!(false), None);
+                    co.restart = true;
                 }
-                Err(e) => {
-                    _ = tele.edit_message_text(chat_id, placeholder.id, "Sorry, an error has occured. Please try again later!");
-                    log::error!("OpenAI returns error: {}", e);
+
+                match openai.chat_completion(&chat_id.to_string(), &text, &co).await {
+                    Ok(r) => {
+                        _ = tele.edit_message_text(chat_id, placeholder.id, r.choice);
+                    }
+                    Err(e) => {
+                        _ = tele.edit_message_text(chat_id, placeholder.id, "Sorry, an error has occured. Please try again later!");
+                        log::error!("OpenAI returns error: {}", e);
+                    }
                 }
             }
         }

@@ -43,7 +43,7 @@ async fn handler(tele: Telegram, placeholder_text: &str, system_prompt: &str, he
             _ = tele.send_message(chat_id, help_mesg);
 
         } else if text.eq_ignore_ascii_case("/start") {
-            _ = tele.send_message(I am your assistant on Telegram for MoreLogin. Ask me any question! To start a new conversation, type the /restart command.);
+            _ = tele.send_message(chat_id,"I am your assistant on Telegram for MoreLogin. Ask me any question! To start a new conversation, type the /restart command.");
             set(&chat_id.to_string(), json!(true), None);
             log::info!("Started converstion for {}", chat_id);
 
